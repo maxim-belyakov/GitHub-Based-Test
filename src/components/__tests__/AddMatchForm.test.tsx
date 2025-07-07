@@ -4,7 +4,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import matchReducer from '../../store/matchSlice';
 import { AddMatchForm } from '../AddMatchForm';
 
-describe('AddMatchForm1', () => {
+describe('AddMatchForm', () => {
   const renderWithStore = () => {
     const store = configureStore({
       reducer: {
@@ -19,11 +19,11 @@ describe('AddMatchForm1', () => {
     );
   };
 
-  it('should render form inputs and buton', () => {
+  it('should render form inputs and button', () => {
     renderWithStore();
 
     expect(screen.getByLabelText('Home Team')).toBeInTheDocument();
-    expect(screen.getByLabelText('Away Team')).toBeInTheDocument()
+    expect(screen.getByLabelText('Away Team')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Start Match' })).toBeInTheDocument();
   });
 
