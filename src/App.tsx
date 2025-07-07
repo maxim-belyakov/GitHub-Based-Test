@@ -1,4 +1,5 @@
 import { Scoreboard } from './components/Scoreboard';
+import { AddMatchForm } from './components/AddMatchForm';
 import './App.css';
 
 function App() {
@@ -8,6 +9,10 @@ function App() {
         <h1>Live Football World Cup Scoreboard</h1>
       </header>
       <main className="app-main">
+        <section className="add-match-section">
+          <h2>Start New Match</h2>
+          <AddMatchForm />
+        </section>
         <section className="scoreboard-section">
           <h2>Live Matches</h2>
           <Scoreboard />
