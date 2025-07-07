@@ -26,4 +26,46 @@ describe('AddMatchForm1', () => {
     expect(screen.getByLabelText('Away Team')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Start Match' })).toBeInTheDocument();
   });
+
+  it('should clear inputs after successful submission', () => {
+    renderWithStore();
+
+    const homeInput = screen.getByLabelText('Home Team') as HTMLInputElement;
+    const awayInput = screen.getByLabelText('Away Team') as HTMLInputElement;
+    const submitButton = screen.getByRole('button', { name: 'Start Match' });
+
+    fireEvent.change(homeInput, { target: { value: 'Spain' } });
+    fireEvent.change(awayInput, { target: { value: 'Brazil' } });
+    fireEvent.click(submitButton);
+
+    expect(homeInput.value).toBe('');
+    expect(awayInput.value).toBe('');
+  });
+
+  it('should show alert when submitting empty team names', () => {
+    renderWithStore();
+    const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => {});
+
+    const submitButton = screen.getByRole('button', { name: 'Start Match' });
+    fireEvent.click(submitButton);
+
+    expect(alertSpy).toHaveBeenCalledWith('Please enter both team names');
+    alertSpy.mockRestore();
+  });
+
+  it('should show alert when home and away teams are the same', () => {
+    renderWithStore();
+    const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => {});
+
+    const homeInput = screen.getByLabelText('Home Team');
+    const awayInput = screen.getByLabelText('Away Team');
+    const submitButton = screen.getByRole('button', { name: 'Start Match' });
+
+    fireEvent.change(homeInput, { target: { value: 'Spain' } });
+    fireEvent.change(awayInput, { target: { value: 'Spain' } });
+    fireEvent.click(submitButton);
+
+    expect(alertSpy).toHaveBeenCalledWith('Home and away teams must be different');
+    alertSpy.mockRestore();
+  });
 });
