@@ -1,14 +1,17 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { startMatch } from '../store/matchSlice';
+import { createMatch } from '../store/matchThunks';
+import { RootState, AppDispatch } from '../store/store';
 import './AddMatchForm.css';
 
 export function AddMatchForm() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
+  const useBackend = useSelector((state: RootState) => state.matches.useBackend);
   const [homeTeam, setHomeTeam] = useState('');
   const [awayTeam, setAwayTeam] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!homeTeam.trim() || !awayTeam.trim()) {
@@ -22,10 +25,17 @@ export function AddMatchForm() {
     }
 
     try {
-      dispatch(startMatch({
+      const matchData = {
         homeTeam: homeTeam.trim(),
         awayTeam: awayTeam.trim(),
-      }));
+      };
+
+      if (useBackend) {
+        await dispatch(createMatch(matchData)).unwrap();
+      } else {
+        dispatch(startMatch(matchData));
+      }
+      
       setHomeTeam('');
       setAwayTeam('');
     } catch (error) {

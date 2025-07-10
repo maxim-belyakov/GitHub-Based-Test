@@ -31,3 +31,14 @@ package-lock.json
 
 # typescript
 *.tsbuildinfo
+
+# Java/Maven
+backend/target/
+backend/*.iml
+backend/.mvn/
+backend/mvnw
+backend/mvnw.cmd
+
+# Database
+*.db
+*.sqlite

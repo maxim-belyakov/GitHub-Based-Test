@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { updateScore, finishMatch } from '../store/matchSlice';
+import { updateMatchScore, deleteMatch } from '../store/matchThunks';
 import { Match } from '../types/Match';
+import { RootState, AppDispatch } from '../store/store';
 import './MatchCard.css';
 
 interface MatchCardProps {
@@ -10,12 +12,13 @@ interface MatchCardProps {
 }
 
 export function MatchCard({ match, rank }: MatchCardProps) {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
+  const useBackend = useSelector((state: RootState) => state.matches.useBackend);
   const [isEditing, setIsEditing] = useState(false);
   const [homeScore, setHomeScore] = useState(match.homeScore.toString());
   const [awayScore, setAwayScore] = useState(match.awayScore.toString());
 
-  const handleUpdateScore = () => {
+  const handleUpdateScore = async () => {
     const newHomeScore = parseInt(homeScore);
     const newAwayScore = parseInt(awayScore);
 
@@ -29,17 +32,37 @@ export function MatchCard({ match, rank }: MatchCardProps) {
       return;
     }
 
-    dispatch(updateScore({
-      matchId: match.id,
-      homeScore: newHomeScore,
-      awayScore: newAwayScore,
-    }));
-    setIsEditing(false);
+    try {
+      if (useBackend) {
+        await dispatch(updateMatchScore({
+          matchId: match.id,
+          homeScore: newHomeScore,
+          awayScore: newAwayScore,
+        })).unwrap();
+      } else {
+        dispatch(updateScore({
+          matchId: match.id,
+          homeScore: newHomeScore,
+          awayScore: newAwayScore,
+        }));
+      }
+      setIsEditing(false);
+    } catch (error) {
+      alert('Failed to update score');
+    }
   };
 
-  const handleFinishMatch = () => {
+  const handleFinishMatch = async () => {
     if (window.confirm(`Are you sure you want to finish the match between ${match.homeTeam} and ${match.awayTeam}?`)) {
-      dispatch(finishMatch(match.id));
+      try {
+        if (useBackend) {
+          await dispatch(deleteMatch(match.id)).unwrap();
+        } else {
+          dispatch(finishMatch(match.id));
+        }
+      } catch (error) {
+        alert('Failed to finish match');
+      }
     }
   };
 

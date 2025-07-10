@@ -1,6 +1,6 @@
 # Live Football World Cup Scoreboard
 
-A React application with TypeScript and Redux for managing live football match scores.
+A full-stack application with React TypeScript frontend and Java Spring Boot backend for managing live football match scores.
 
 ## Features
 
@@ -10,15 +10,33 @@ A React application with TypeScript and Redux for managing live football match s
 - Get a summary of all matches in progress, ordered by:
   - Total score (descending)
   - Most recently started match (for matches with same total score)
+- Toggle between local Redux state and backend API
+- Input sanitization on both frontend and backend
+- RESTful API with H2 in-memory database
 
 ## Tech Stack
 
+### Frontend
 - **React** - UI library
 - **TypeScript** - Type safety
 - **Redux Toolkit** - State management
 - **Vite** - Build tool
 - **Jest** - Testing framework
 - **Testing Library** - React testing utilities
+
+### Backend
+- **Java 17** - Programming language
+- **Spring Boot 3.2.0** - Framework
+- **Spring Data JPA** - Data persistence
+- **H2 Database** - In-memory database
+- **Apache Commons Text** - Input sanitization
+- **Bean Validation** - Input validation
+
+## Prerequisites
+
+- Node.js 16 or higher
+- Java 17 or higher
+- Maven 3.6 or higher
 
 ## Installation
 
@@ -27,17 +45,39 @@ A React application with TypeScript and Redux for managing live football match s
 git clone https://github.com/maxim-belyakov/sportradar.git
 cd sportradar
 
-# Install dependencies with Yarn
+# Install frontend dependencies with Yarn
 yarn install
 ```
 
 ## Running the Application
+
+### Option 1: Frontend Only (with local Redux state)
 
 ```bash
 # Start the development server
 yarn start
 
 # The application will be available at http://localhost:5173
+```
+
+### Option 2: Full Stack (with Java backend)
+
+#### Start the Backend:
+```bash
+cd backend
+mvn spring-boot:run
+
+# The backend will be available at http://localhost:8080
+# H2 Console: http://localhost:8080/h2-console (username: sa, no password)
+```
+
+#### Start the Frontend:
+```bash
+# In the root directory
+yarn start
+
+# The application will be available at http://localhost:5173
+# Toggle "Use Backend API" checkbox to switch between local and backend storage
 ```
 
 ## Usage
@@ -50,20 +90,34 @@ yarn start
 ## Project Structure
 
 ```
-src/
-├── components/          # React components
-│   ├── AddMatchForm.tsx    # Form to add new matches
-│   ├── MatchCard.tsx       # Individual match display
-│   └── Scoreboard.tsx      # Main scoreboard container
-├── store/              # Redux store configuration
-│   ├── matchSlice.ts      # Match state and actions
-│   ├── selectors.ts       # Memoized selectors
-│   └── store.ts           # Store configuration
-├── types/              # TypeScript type definitions
-│   └── Match.ts           # Match interfaces
-├── App.tsx             # Main application component
-├── main.tsx            # Application entry point
-└── *.css               # Styling files
+.
+├── backend/                    # Java Spring Boot backend
+│   └── src/main/java/com/sportradar/matchtracker/
+│       ├── controller/        # REST controllers
+│       ├── dto/              # Data transfer objects
+│       ├── entity/           # JPA entities
+│       ├── repository/       # Data repositories
+│       ├── service/          # Business logic
+│       ├── util/            # Utilities (sanitizer)
+│       └── config/          # Configuration classes
+├── src/                      # React TypeScript frontend
+│   ├── components/          # React components
+│   │   ├── AddMatchForm.tsx    # Form to add new matches
+│   │   ├── MatchCard.tsx       # Individual match display
+│   │   └── Scoreboard.tsx      # Main scoreboard container
+│   ├── store/              # Redux store configuration
+│   │   ├── matchSlice.ts      # Match state and actions
+│   │   ├── matchThunks.ts     # Async actions for API
+│   │   ├── selectors.ts       # Memoized selectors
+│   │   └── store.ts           # Store configuration
+│   ├── services/           # API services
+│   │   └── api.ts            # Backend API integration
+│   ├── types/              # TypeScript type definitions
+│   │   └── Match.ts           # Match interfaces
+│   ├── App.tsx             # Main application component
+│   ├── main.tsx            # Application entry point
+│   └── *.css               # Styling files
+└── README.md              # This file
 ```
 
 ## Development
@@ -93,15 +147,26 @@ yarn preview
 yarn lint
 ```
 
+## API Endpoints
+
+- `GET /api/matches` - Get all matches
+- `GET /api/matches/{id}` - Get a specific match
+- `POST /api/matches` - Create a new match
+- `PUT /api/matches/{id}/score` - Update match score
+- `DELETE /api/matches/{id}` - Finish/delete a match
+
 ## Design Decisions
 
 1. **Redux Toolkit**: Used for simplified Redux setup with built-in best practices
-2. **In-Memory Storage**: Matches stored in Redux state with unique ID generation
-3. **Memoized Selectors**: Used `createSelector` for efficient sorting and filtering
-4. **Component Architecture**: Separated concerns with container and presentational components
-5. **TypeScript**: Strong typing throughout the application for better developer experience
-6. **Vite**: Modern build tool for fast development and optimized production builds
-7. **Responsive Design**: Mobile-friendly layout that adapts to different screen sizes
+2. **Dual Storage**: Support for both local Redux state and backend API storage
+3. **In-Memory Database**: H2 for quick development without external dependencies
+4. **Input Sanitization**: Protection against XSS on both frontend and backend
+5. **Memoized Selectors**: Used `createSelector` for efficient sorting and filtering
+6. **Component Architecture**: Separated concerns with container and presentational components
+7. **TypeScript**: Strong typing throughout the application for better developer experience
+8. **Vite**: Modern build tool for fast development and optimized production builds
+9. **Responsive Design**: Mobile-friendly layout that adapts to different screen sizes
+10. **Spring Boot**: Rapid backend development with embedded server
 
 ## Assumptions
 
